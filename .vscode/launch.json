@@ -7,8 +7,8 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Open home.html",
-            "file": "c:\\Users\\Alisya Aida\\Desktop\\Muzec---Song-Recs-System\\html\\home.html"
+            "name": "Open login.html",
+            "file": "C:\\Users\\Alisya Aida\\Desktop\\Muzec---Song-Recs-System\\startbootstrap-sb-admin-2\\login.html"
         }
     ]
 }
