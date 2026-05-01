@@ -51,8 +51,7 @@
 
                         <!-- Nav Item - Home -->
                         <li class="nav-item active">
-                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1"
-                                href="index.html">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="index.html">
                                 <i class="fas fa-fw fa-home"></i>
                                 <span>Home</span>
                             </a>
@@ -103,60 +102,70 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Account Details</h6>
                                 </div>
                                 <div class="card-body">
-                                    <p><strong>Name:</strong> User Name</p>
-                                    <p><strong>Email:</strong> user@email.com</p>
-                                    <p><strong>Password:</strong> ********</p>
-                                    <p><strong>Member Since:</strong> Jan 2026</p>
+                                    <div class="mb-3"><label for="name" class="form-label text-dark">Name:</label>
+                                        <input type="text" class="form-control form-control-sm" id="name"
+                                            placeholder="User Name">
+                                    </div>
+
+                                    <div class="mb-3"><label for="email" class="form-label text-dark">Email:</label>
+                                        <input type="email" class="form-control form-control-sm" id="email"
+                                            placeholder="user@gmail.com">
+                                    </div>
+
+                                    <div class="mb-3"><label for="password"
+                                            class="form-label text-dark">Password:</label>
+                                        <input type="password" class="form-control form-control-sm" id="password"
+                                            placeholder="Enter new password">
+                                    </div>
 
                                     <div class="d-flex justify-content-center">
-                                        <a href="editprofile.html" class="btn btn-primary">Edit profile
+                                        <a href="profile.html" class="btn btn-primary">Submit
                                         </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- End of Page Content -->
+                    <!-- End of Page Content -->
 
-                <!-- Footer -->
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>Copyright &copy; 2026 Muzec. All Rights Reserved.</span>
+                    <!-- Footer -->
+                    <footer class="sticky-footer bg-white">
+                        <div class="container my-auto">
+                            <div class="copyright text-center my-auto">
+                                <span>Copyright &copy; 2026 Muzec. All Rights Reserved.</span>
+                            </div>
                         </div>
-                    </div>
-                </footer>
-                <!-- End of Footer -->
+                    </footer>
+                    <!-- End of Footer -->
+
+                </div>
+                <!-- End of Content Wrapper -->
 
             </div>
-            <!-- End of Content Wrapper -->
+            <!-- End of Page Wrapper -->
 
-        </div>
-        <!-- End of Page Wrapper -->
+            <!-- Scroll to Top Button-->
+            <a class="scroll-to-top rounded" href="#page-top">
+                <i class="fas fa-angle-up"></i>
+            </a>
 
-        <!-- Scroll to Top Button-->
-        <a class="scroll-to-top rounded" href="#page-top">
-            <i class="fas fa-angle-up"></i>
-        </a>
+            <!-- Bootstrap core JavaScript-->
+            <script src="vendor/jquery/jquery.min.js"></script>
+            <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-        <!-- Bootstrap core JavaScript-->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <!-- Core plugin JavaScript-->
+            <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-        <!-- Core plugin JavaScript-->
-        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+            <!-- Custom scripts for all pages-->
+            <script src="js/sb-admin-2.min.js"></script>
 
-        <!-- Custom scripts for all pages-->
-        <script src="js/sb-admin-2.min.js"></script>
+            <!-- Page level plugins -->
+            <script src="vendor/chart.js/Chart.min.js"></script>
 
-        <!-- Page level plugins -->
-        <script src="vendor/chart.js/Chart.min.js"></script>
-
-        <!-- Page level custom scripts -->
-        <script src="js/demo/chart-area-demo.js"></script>
-        <script src="js/demo/chart-pie-demo.js"></script>
+            <!-- Page level custom scripts -->
+            <script src="js/demo/chart-area-demo.js"></script>
+            <script src="js/demo/chart-pie-demo.js"></script>
 
 </body>
 
