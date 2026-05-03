@@ -54,5 +54,4 @@
   "license": "(CC-BY-4.0 AND OFL-1.1 AND MIT)",
   "scripts": {
     "postinstall": "node attribution.js"
-  }
-}
+  }}
