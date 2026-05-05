@@ -162,7 +162,7 @@
                                         </div>
 
                                         <div class="d-flex justify-content-center">
-                                            <button type="submit" class="btn btn-primary">
+                                            <button type="submit" id="recommendBtn" class="btn btn-primary">
                                                 <i class="fas fa-star"></i> Get Recommendation
                                             </button>
                                         </div>
@@ -184,20 +184,20 @@
                                     <div class="card bg-light border-3 mb-3">
                                         <div class="card-body text-center p-3 pt-2">
                                             <i class="fas fa-fw fa-music"></i>
-                                            <h4 class="card-title text-dark mb-1">Song name</h4>
-                                            <p class="text-muted mb-2">Artist name</p>
+                                            <h4 id="songName" class="card-title text-dark mb-1"></h4>
+                                            <p id="artistName" class="text-muted mb-2"></p>
                                         </div>
                                     </div>
 
                                     <!-- Rating -->
                                     <div class="row g-0 mb-3">
                                         <div class="col-6">
-                                            <button type="button" class="btn btn-outline-success w-100 rounded-end-0">
+                                            <button id="likeBtn" type="button" class="btn btn-outline-success w-100 rounded-end-0">
                                                 <i class="fas fa-thumbs-up"></i> Like
                                             </button>
                                         </div>
                                         <div class="col-6">
-                                            <button type="button" class="btn btn-outline-danger w-100 rounded-start-0">
+                                            <button id="dislikeBtn" type="button" class="btn btn-outline-danger w-100 rounded-start-0">
                                                 <i class="fas fa-thumbs-down"></i> Dislike
                                             </button>
                                         </div>
@@ -282,6 +282,9 @@
             <!-- Page level custom scripts -->
             <script src="js/demo/chart-area-demo.js"></script>
             <script src="js/demo/chart-pie-demo.js"></script>
+
+            
+            <script src="js/recommend.js"></script>
 
 </body>
 
