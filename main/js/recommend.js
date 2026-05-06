@@ -81,4 +81,39 @@ function toggleDislike() {
     }
 }
 
+//temporary favorite button
+const favBtn = document.getElementById("favBtn");
+
+if (favBtn) {
+    favBtn.addEventListener("click", function () {
+        addToFavorites();
+    });
+}
+
+function addToFavorites() {
+    const song = songTitle.textContent;
+    const artist = artistName.textContent;
+
+    if (!song || !artist) {
+        alert("No song to add!");
+        return;
+    }
+
+    const newFav = { song, artist };
+
+    // Get existing favorites
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    
+    const exists = favorites.some(f => f.song === song && f.artist === artist);
+
+    if (!exists) {
+        favorites.push(newFav);
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+        alert("Added to favorites ❤️");
+    } else {
+        alert("Already in favorites!");
+    }
+    }
+
+
 });
