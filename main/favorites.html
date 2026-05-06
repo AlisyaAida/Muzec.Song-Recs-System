@@ -103,63 +103,7 @@
 
             <!-- Favorites List -->
             <div class="card shadow-sm">
-              <ul class="list-group list-group-flush">
-
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <div class="d-flex align-items-center">
-
-                    <div>
-                      <div class="fw-semibold text-dark">Song A</div>
-                      <small class="text-muted">Artist Name &middot; Pop</small>
-                    </div>
-                  </div>
-                  <div class="btn-group" role="group">
-                    <a href="#" class="btn btn-sm btn-danger text-white" title="Play on YouTube">
-                      <i class="bi bi-youtube"></i>
-                    </a>
-                    <button class="btn btn-sm btn-outline-danger" title="Remove from favorites">
-                      <i class="bi bi-trash"></i> Remove
-                    </button>
-                  </div>
-                </li>
-
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <div class="d-flex align-items-center">
-
-                    <div>
-                      <div class="fw-semibold text-dark">Song B</div>
-                      <small class="text-muted">Artist Name &middot; Rock</small>
-                    </div>
-                  </div>
-                  <div class="btn-group" role="group">
-                    <a href="#" class="btn btn-sm btn-danger text-white" title="Play on YouTube">
-                      <i class="bi bi-youtube"></i>
-                    </a>
-                    <button class="btn btn-sm btn-outline-danger" title="Remove from favorites">
-                      <i class="bi bi-trash"></i> Remove
-                    </button>
-                  </div>
-                </li>
-
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <div class="d-flex align-items-center">
-
-                    <div>
-                      <div class="fw-semibold text-dark">Song C</div>
-                      <small class="text-muted">Artist Name &middot; Hip-Hop</small>
-                    </div>
-                  </div>
-                  <div class="btn-group" role="group">
-                    <a href="#" class="btn btn-sm btn-danger text-white" title="Play on YouTube">
-                      <i class="bi bi-youtube"></i>
-                    </a>
-                    <button class="btn btn-sm btn-outline-danger" title="Remove from favorites">
-                      <i class="bi bi-trash"></i> Remove
-                    </button>
-                  </div>
-                </li>
-
-              </ul>
+              <ul id="favoritesList" class="list-group list-group-flush"></ul>
             </div>
 
             <!-- Empty state -->
@@ -211,6 +155,9 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <!--jay added this-->
+    <script src="js/favorites.js"></script>
 
 </body>
 
