@@ -103,18 +103,18 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Account Details</h6>
                                 </div>
                                 <div class="card-body">
-                                    <p><strong>Name:</strong> User Name</p>
-                                    <p><strong>Email:</strong> user@gmail.com</p>
+                                    <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+                                    <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
                                     <p><strong>Password:</strong> ********</p>
-                                    <p><strong>Member Since:</strong> Jan 2026</p>
+                                    <p><strong>Member Since:</strong> <span id="profileDate">Loading...</span></p>
 
                                     <div class="d-flex justify-content-center">
                                         <a href="editprofile.html" class="btn btn-primary">Edit profile
                                         </a>
                                     </div>
-                                    <div class="d-flex justify-content-center">
-                                        <a href="login.html" class="btn btn-danger text-white">Log out
-                                        </a>
+                                    <div class="d-flex justify-content-center mt-2">
+                                        <button id="logoutBtn" class="btn btn-danger text-white">Log out</button>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -161,6 +161,9 @@
         <!-- Page level custom scripts -->
         <script src="js/demo/chart-area-demo.js"></script>
         <script src="js/demo/chart-pie-demo.js"></script>
+
+        <script type="module" src="js/firebase-config.js"></script>
+        <script type="module" src="js/profile.js"></script>
 
 </body>
 

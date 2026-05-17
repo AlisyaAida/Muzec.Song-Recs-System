@@ -46,12 +46,12 @@
                                     <form class="user">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
-                                                id="exampleInputEmail" aria-describedby="emailHelp"
+                                                id="emailInput" aria-describedby="emailHelp"
                                                 placeholder="Email Address">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Password">
+                                                id="passwordInput" placeholder="Password">
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
@@ -60,9 +60,13 @@
                                                     Me</label>
                                             </div>
                                         </div>
-                                        <a href="index.html" class="btn btn-primary btn-user btn-block">
+                                        <button type="button" class="btn btn-primary btn-user btn-block" id="loginBtn">
                                             Login
-                                        </a>
+                                            </button>
+
+                                        <!-- Error message shown on wrong credentials -->
+                                        <div id="loginError" class="text-danger text-center small mt-2" style="display:none;"></div>
+
                                     <div class="text-center">
                                         <a class="small" href="register.html">Don't have an account? Register!</a>
                                     </div>
@@ -78,6 +82,14 @@
 
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module" src="js/firebase-config.js"></script>
+
+
+    <script type="module" src="js/login.js"></script>
+    <script type="module" src="js/register.js"></script>
+
+
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -85,8 +97,9 @@
     <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
+    <!-- jay added this just for testing-->
     <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
+    <!-- <script src="js/sb-admin-2.min.js"></script> -->
 
 </body>
 

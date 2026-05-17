@@ -1,119 +1,117 @@
-// Wait until DOM is fully loaded
+import { auth, db } from "./js/firebase-config.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+  collection, addDoc, query, where,
+  getDocs, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", function () {
+  let currentUser = null;
 
-    const recommendBtn = document.getElementById("recommendBtn");
-    const songTitle = document.getElementById("songName");
-    const artistName = document.getElementById("artistName");
+  // Track who's logged in
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+    } else {
+      // Redirect to login if not authenticated
+      window.location.href = "login.html";
+    }
+  });
 
-    const likeBtn = document.getElementById("likeBtn");
-    const dislikeBtn = document.getElementById("dislikeBtn");
+  const recommendBtn = document.getElementById("recommendBtn");
+  const songTitle    = document.getElementById("songName");
+  const artistName   = document.getElementById("artistName");
+  const likeBtn      = document.getElementById("likeBtn");
+  const dislikeBtn   = document.getElementById("dislikeBtn");
+  const addToFavBtn  = document.getElementById("addToFavBtn");
 
-    songTitle.textContent = "";
-    artistName.textContent = "";
+  songTitle.textContent = "";
+  artistName.textContent = "";
 
-    // Recommend button
-    if (recommendBtn) {
-        recommendBtn.addEventListener("click", function (event) {
-            event.preventDefault();
+  if (recommendBtn) {
+    recommendBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      showSampleSong();
+      resetRating();
+    });
+  }
 
-            showSampleSong();
-            resetRating(); // reset like/dislike when new song appears
+  if (likeBtn) likeBtn.addEventListener("click", toggleLike);
+  if (dislikeBtn) dislikeBtn.addEventListener("click", toggleDislike);
+
+  //Add to Favorites
+  if (addToFavBtn) {
+    addToFavBtn.addEventListener("click", async function () {
+      if (!currentUser) {
+        alert("You must be logged in.");
+        return;
+      }
+
+      const name   = songTitle.textContent;
+      const artist = artistName.textContent;
+
+      if (!name || !artist) {
+        alert("Get a recommendation first!");
+        return;
+      }
+
+      try {
+        const favsRef = collection(db, "users", currentUser.uid, "favorites");
+
+        // Check for duplicates
+        const existing = await getDocs(query(favsRef, where("name", "==", name)));
+        if (!existing.empty) {
+          alert(`"${name}" is already in your Favorites.`);
+          return;
+        }
+
+        // Save to Firestore
+        await addDoc(favsRef, {
+          name,
+          artist,
+          addedAt: serverTimestamp()
         });
-    }
 
-    // Like button
-    if (likeBtn) {
-        likeBtn.addEventListener("click", function () {
-            toggleLike();
-        });
-    }
+        // Visual feedback
+        addToFavBtn.innerHTML = '<i class="bi bi-heart-fill"></i> Added!';
+        addToFavBtn.classList.replace("btn-primary", "btn-success");
+        setTimeout(() => {
+          addToFavBtn.innerHTML = '<i class="bi bi-heart-fill"></i> Add to Favorites';
+          addToFavBtn.classList.replace("btn-success", "btn-primary");
+        }, 2000);
 
-    // Dislike button
-    if (dislikeBtn) {
-        dislikeBtn.addEventListener("click", function () {
-            toggleDislike();
-        });
-    }
+      } catch (err) {
+        console.error("Error adding to favorites:", err);
+        alert("Something went wrong. Try again.");
+      }
+    });
+  }
 
-    function showSampleSong() {
-        const sampleSong = {
-            name: "Bad",
-            artist: "Michael Jackson"
-        };
+  //Helpers
+  function showSampleSong() {
+    songTitle.textContent  = "Bad";
+    artistName.textContent = "Michael Jackson";
 
-        songTitle.textContent = sampleSong.name;
-        artistName.textContent = sampleSong.artist;
-    }
+    addToFavBtn.innerHTML = '<i class="bi bi-heart-fill"></i> Add to Favorites';
+    addToFavBtn.classList.replace("btn-success", "btn-primary");
+  }
 
-    function resetRating() {
-        likeBtn.classList.remove("btn-success");
-        likeBtn.classList.add("btn-outline-success");
-
-        dislikeBtn.classList.remove("btn-danger");
-        dislikeBtn.classList.add("btn-outline-danger");
-    }
+  function resetRating() {
+    likeBtn.classList.remove("btn-success");
+    likeBtn.classList.add("btn-outline-success");
+    dislikeBtn.classList.remove("btn-danger");
+    dislikeBtn.classList.add("btn-outline-danger");
+  }
 
   function toggleLike() {
-    const isActive = likeBtn.classList.contains("btn-success");
+    if (likeBtn.classList.contains("btn-success")) { resetRating(); return; }
+    resetRating();
+    likeBtn.classList.replace("btn-outline-success", "btn-success");
+  }
 
-    if (isActive) {
-        // If already liked → reset (turn off)
-        resetRating();
-    } else {
-        // Otherwise → activate like and deactivate dislike
-        resetRating();
-        likeBtn.classList.remove("btn-outline-success");
-        likeBtn.classList.add("btn-success");
-    }
-}
-
-function toggleDislike() {
-    const isActive = dislikeBtn.classList.contains("btn-danger");
-
-    if (isActive) {
-        // If already disliked → reset (turn off)
-        resetRating();
-    } else {
-        // Otherwise → activate dislike and deactivate like
-        resetRating();
-        dislikeBtn.classList.remove("btn-outline-danger");
-        dislikeBtn.classList.add("btn-danger");
-    }
-}
-
-//temporary favorite button
-const favBtn = document.getElementById("favBtn");
-
-if (favBtn) {
-    favBtn.addEventListener("click", function () {
-        addToFavorites();
-    });
-}
-
-function addToFavorites() {
-    const song = songTitle.textContent;
-    const artist = artistName.textContent;
-
-    if (!song || !artist) {
-        alert("No song to add!");
-        return;
-    }
-
-    const newFav = { song, artist };
-
-    // Get existing favorites
-    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    
-    const exists = favorites.some(f => f.song === song && f.artist === artist);
-
-    if (!exists) {
-        favorites.push(newFav);
-        localStorage.setItem("favorites", JSON.stringify(favorites));
-        alert("Added to favorites ❤️");
-    } else {
-        alert("Already in favorites!");
-    }
-    }
-
-
+  function toggleDislike() {
+    if (dislikeBtn.classList.contains("btn-danger")) { resetRating(); return; }
+    resetRating();
+    dislikeBtn.classList.replace("btn-outline-danger", "btn-danger");
+  }
 });
