@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Muzec - Top Charts</title>
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="css/muzec.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top" class="d-flex flex-column" style="min-height: 100vh;">
+
+    <div id="wrapper">
+
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <div id="content">
+
+                <nav class="navbar navbar-expand navbar-light topbar static-top shadow align-items-center"
+                    style="background: linear-gradient(90deg, #B379E3 50%, #6EE7F2 70%);">
+
+                    <ul class="navbar-nav align-items-center">
+
+                        <li class="nav-item">
+                            <a class="sidebar-brand d-flex align-items-center justify-content-center">
+                                <div class="sidebar-brand-icon">
+                                    <img class="img-profile rounded-circle" src="img/logo_only.png"
+                                        style="width: 90px; height: 90px;">
+                                </div>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="index.html">
+                                <i class="fas fa-fw fa-home"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item active">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="topcharts.html">
+                                <i class="fas fa-fw fa-trophy"></i>
+                                <span>Top Charts</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="favorites.html">
+                                <i class="fas fa-fw fa-heart"></i>
+                                <span>Favorites</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <ul class="navbar-nav ml-auto align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <span class="mr-2 d-none d-lg-inline text-white">Username</span>
+                                <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                                <div class="dropdown-divider"></div>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <main class="main-background flex-grow-1 py-4">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 chart-header">
+                            <div class="title-name mb-2">
+                                <h1 class="h3 text-gray-800" style="font-weight: bold;">Top Charts</h1>
+                                <p class="text-muted m-0">Top songs per genre synced with Spotify</p>
+                            </div>
+                            <div class="genre-bar" role="group" aria-label="Genre filter">
+                                <a href="topcharts.html" class="btn btn-primary btn-sm genre-btn shadow-sm">All</a>
+                                <a href="poptopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">Pop</a>
+                                <a href="rocktopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">Rock</a>
+                                <a href="hiphoptopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">Hip-Hop</a>
+                                <a href="jazztopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">Jazz</a>
+                                <a href="classicaltopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">Classical</a>
+                                <a href="kpoptopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">K-Pop</a>
+                                <a href="rnbtopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">R&B</a>
+                                <a href="indietopcharts.html" class="btn btn-outline-primary btn-sm genre-btn shadow-sm">Indie</a>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">Pop</h5>
+                                    </div>
+                                    <ol id="pop-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="poptopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">Rock</h5>
+                                    </div>
+                                    <ol id="rock-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="rocktopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">Hip-Hop</h5>
+                                    </div>
+                                    <ol id="hiphop-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="hiphoptopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">Jazz</h5>
+                                    </div>
+                                    <ol id="jazz-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="jazztopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">Classical</h5>
+                                    </div>
+                                    <ol id="classical-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="classicaltopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">K-Pop</h5>
+                                    </div>
+                                    <ol id="kpop-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="kpoptopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">R&B</h5>
+                                    </div>
+                                    <ol id="rnb-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="rnbtopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xl-4 col-md-6 mb-4">
+                                <div class="card shadow h-100">
+                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                                        <h5 class="m-0 font-weight-bold text-primary">Indie</h5>
+                                    </div>
+                                    <ol id="indie-chart-container" class="list-group list-group-numbered list-group-flush text-dark">
+                                        <div class="p-3 text-muted text-center small"><i class="fas fa-spinner fa-spin"></i> Fetching live charts...</div>
+                                    </ol>
+                                    <div class="card-footer bg-white text-center mt-auto">
+                                        <a href="indietopcharts.html" class="text-decoration-none small">View all 20 <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+            <footer class="sticky-footer bg-white border-top py-3 mt-auto">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto text-muted small">
+                        <span>Copyright &copy; 2026 Muzec. All Rights Reserved.</span>
+                    </div>
+                </div>
+            </footer>
+            </div>
+        </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <script type="module" src="js/charts-loader.js"></script>
+
+</body>
+
+</html>

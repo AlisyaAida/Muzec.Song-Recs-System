@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Muzec - Home</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow align-items-center"
+                    style="background: linear-gradient(90deg, #B379E3 50%, #6EE7F2 70%);">
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav align-items-center">
+
+                        <li class="nav-item">
+                            <a class="sidebar-brand d-flex align-items-center justify-content-center">
+                                <div class="sidebar-brand-icon">
+                                    <img class="img-profile rounded-circle" src="img/logo_only.png"
+                                        style="width: 90px; height: 90px;">
+                                </div>
+                            </a>
+                        </li>
+
+                        <!-- Nav Item - Home -->
+                        <li class="nav-item active">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="index.html">
+                                <i class="fas fa-fw fa-home"></i>
+                                <span>Home</span>
+                            </a>
+                        </li>
+
+                        <!-- Nav Item - Top Charts -->
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="topcharts.html">
+                                <i class="fas fa-fw fa-trophy"></i>
+                                <span>Top Charts</span>
+                            </a>
+                        </li>
+
+                        <!-- Nav Item - Favorites -->
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm rounded-pill text-dark mx-1 px-2 py-1" href="favorites.html">
+                                <i class="fas fa-fw fa-heart"></i>
+                                <span>Favorites</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Topbar Right Side -->
+                    <ul class="navbar-nav ml-auto align-items-center">
+
+                        <!-- Nav Item - Profile -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="profile.html">
+                                <span class="mr-2 d-none d-lg-inline text-white">Username</span>
+                                <img class="img-profile rounded-circle" src="img/undraw_profile.svg">
+                                <div class="dropdown-divider"></div>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- TUKAR CONTENT KAT SINI YAAAA -->
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-2 text-gray-800">Recommendations</h1>
+                    </div>
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Content Column -->
+                        <div class="col-lg-6 mb-4">
+
+                            <!-- Preferences Card -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Your Preferences</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="mood" class="form-label text-dark">How do you feel?</label>
+                                            <select class="form-control form-control-sm" id="mood">
+                                                <option>Happy</option>
+                                                <option>Neutral</option>
+                                                <option>Sad</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="genre" class="form-label text-dark">Favorite Genre</label>
+                                            <select class="form-control form-control-sm" id="genre">
+                                                <option>Any</option>
+                                                <option>Pop</option>
+                                                <option>Rock</option>
+                                                <option>Hip-Hop</option>
+                                                <option>Jazz</option>
+                                                <option>Classical</option>
+                                                <option>K-Pop</option>
+                                                <option>R&B</option>
+                                                <option>Indie</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="language" class="form-label text-dark">Language</label>
+                                            <select class="form-control form-control-sm" id="language">
+                                                <option>Any</option>
+                                                <option>English</option>
+                                                <option>Malay</option>
+                                                <option>Mandarin</option>
+                                                <option>Korean</option>
+                                                <option>Japanese</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="songAge" class="form-label text-dark">SongAge</label>
+                                            <select class="form-control form-control-sm" id="songAge">
+                                                <option>Up to 10 years</option>
+                                                <option>Up to 20 years</option>
+                                                <option>Up to 30 years</option>
+                                                <option>Any</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark">Appropriateness</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="appropriate"
+                                                    id="app1" checked>
+                                                <label class="form-check-label" for="app1">All ages</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="appropriate"
+                                                    id="app2">
+                                                <label class="form-check-label" for="app2">Explicit allowed</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-center">
+                                            <button type="button" id="recommendBtn" class="btn btn-primary">
+                                                <i class="fas fa-star"></i> Get Recommendation
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 mb-4">
+
+                            <!-- Recommendations Card -->
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Recommended For You</h6>
+                                </div>
+                                <div class="card-body flex-column">
+
+                                    <!-- Song card -->
+                                    <div class="card bg-light border-3 mb-3">
+                                        <div class="card-body text-center p-3 pt-2">
+                                            <i class="fas fa-fw fa-music"></i>
+                                            <h4 id="songName" class="card-title text-dark mb-1"></h4>
+                                            <p id="artistName" class="text-muted mb-2"></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rating -->
+                                    <div class="row g-0 mb-3">
+                                        <div class="col-6">
+                                            <button id="likeBtn" type="button" class="btn btn-outline-success w-100 rounded-end-0">
+                                                <i class="fas fa-thumbs-up"></i> Like
+                                            </button>
+                                        </div>
+                                        <div class="col-6">
+                                            <button id="dislikeBtn" type="button" class="btn btn-outline-danger w-100 rounded-start-0">
+                                                <i class="fas fa-thumbs-down"></i> Dislike
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Favorites & Actions -->
+                                    <div class="d-grid gap-2 mt-auto">
+                                        <div class="row g-2">
+                                            <div class="col-4">
+                                                <a id="youtubeBtn" href="#" class="btn btn-danger w-100 text-white">
+                                                    <i class="fab fa-youtube"></i> YouTube
+                                                </a>
+                                            </div>
+                                            <div class="col-4">
+                                                <button id="favBtn" type="button" class="btn btn-outline-danger w-100 py-1">
+                                                    <i class="fas fa-heart"></i> Favorites
+                                                </button>
+                                            </div>
+                                            <div class="col-4">
+                                                <button type="button" id="anotherBtn" class="btn btn-warning w-100 text-white">
+                                                    <i class="fas fa-redo"></i> Another
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Feedback -->
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-12">
+                                            <textarea class="form-control form-control-sm text-black" id="reviewText"
+                                                rows="3"
+                                                placeholder="Share your thoughts about the song with others!"></textarea>
+                                        </div>
+                                        <div class="col-6">
+                                            <button id="submitReviewBtn" type="button" class="btn btn-success w-100 py-1">
+                                                <i class="fas fa-paper-plane"></i> Submit Review
+                                            </button>
+                                        </div>
+                                        <div class="col-6">
+                                            <button id="viewReviewsBtn" type="button" class="btn btn-primary w-100 py-1">
+                                                <i class="fas fa-cloud"></i>View other feedbacks
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End of Page Content -->
+
+                    <!-- Footer -->
+                    <footer class="sticky-footer bg-white">
+                        <div class="container my-auto">
+                            <div class="copyright text-center my-auto">
+                                <span>Copyright &copy; 2026 Muzec. All Rights Reserved.</span>
+                            </div>
+                        </div>
+                    </footer>
+                    <!-- End of Footer -->
+
+                </div>
+                <!-- End of Content Wrapper -->
+
+            </div>
+            <!-- End of Page Wrapper -->
+
+            <!-- Scroll to Top Button-->
+            <a class="scroll-to-top rounded" href="#page-top">
+                <i class="fas fa-angle-up"></i>
+            </a>
+
+            <!-- Firebase SDK -->
+            <script type="module" src="js/firebase-config.js"></script>
+            
+            <!-- Bootstrap core JavaScript-->
+            <script src="vendor/jquery/jquery.min.js"></script>
+            <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+            <!-- Core plugin JavaScript-->
+            <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+            <!-- Custom scripts for all pages-->
+            <script src="js/sb-admin-2.min.js"></script>
+
+            <!-- Page level plugins -->
+            <script src="vendor/chart.js/Chart.min.js"></script>
+
+            <!-- Page level custom scripts -->
+            <script src="js/demo/chart-area-demo.js"></script>
+            <script src="js/demo/chart-pie-demo.js"></script>
+
+            
+            <script type="module" src="js/recommend.js"></script>
+
+</body>
+
+</html>
