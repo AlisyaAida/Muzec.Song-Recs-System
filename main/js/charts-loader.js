@@ -32,4 +32,9 @@ document.addEventListener("DOMContentLoaded", () => {
     populateChartCard("Pop", "pop-chart-container");
     populateChartCard("Rock", "rock-chart-container");
     populateChartCard("Hip-Hop", "hiphop-chart-container");
+    populateChartCard("Jazz", "jazz-chart-container");
+    populateChartCard("Classical", "classical-chart-container");
+    populateChartCard("K-Pop", "kpop-chart-container");
+    populateChartCard("R&B", "rnb-chart-container");
+    populateChartCard("Indie", "indie-chart-container");
 });
