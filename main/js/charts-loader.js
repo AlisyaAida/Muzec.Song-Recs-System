@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     populateChartCard("Jazz", "jazz-chart-container");
     populateChartCard("Classical", "classical-chart-container");
     populateChartCard("K-Pop", "kpop-chart-container");
-    populateChartCard("Pop", "pop-chart-container");
     populateChartCard("R&B", "rnb-chart-container");
     populateChartCard("Indie", "indie-chart-container");
 });
