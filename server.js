@@ -1,13 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const fetch = require("node-fetch");
+const fetch = (...args) => import("node-fetch").then(({default: fetch}) => fetch(...args));
 const path = require("path");
 const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, "main")));
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+console.log("ID:", CLIENT_ID, "SECRET:", CLIENT_SECRET);
 const PORT = process.env.PORT || 3000;
 app.get("/api/token", async (req, res) => {
   try {
