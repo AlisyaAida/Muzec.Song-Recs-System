@@ -32,49 +32,46 @@ const MOOD_MAP = {
     'Sad':     'sad emotional'
 };
 
-// ── RECOMMENDATIONS (uses Search API — Recommendations API is deprecated) ─────
-export async function fetchSpotifyRecommendations(genre, mood, songAge, allowExplicit) {
-    const token = await getSpotifyToken();
-    if (!token) return null;
+// Ask Gemini for a song recommendation
+export async function getGeminiRecommendation(mood, genre, language, songAge, allowExplicit, songHistory=[]) {
+  try {
+    const response = await fetch("http://localhost:3000/api/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mood, genre, language, songAge, allowExplicit, songHistory })
+    });
 
-    const genreWord = genre === 'Any'
-        ? RANDOM_GENRES[Math.floor(Math.random() * RANDOM_GENRES.length)]
-        : (GENRE_MAP[genre] || 'pop');
+    const data = await response.json();
+    if (data.error) { console.error("Gemini error:", data.error); return null; }
+    return data; // { name, artist, reason }
 
-    const moodWord = MOOD_MAP[mood] || 'popular';
-    const q        = encodeURIComponent(`${genreWord} ${moodWord}`);
+  } catch (err) {
+    console.error("Recommendation fetch error:", err);
+    return null;
+  }
+}
 
-    try {
-        const response = await fetch(
-            `https://api.spotify.com/v1/search?q=${q}&type=track&limit=10`,
-            { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        if (!response.ok) { console.error('Search error:', await response.text()); return null; }
+// Search Spotify for the exact song Gemini suggested
+export async function searchSpotifyForSong(songName, artistName) {
+  const token = await getSpotifyToken();
+  if (!token) return null;
 
-        const data = await response.json();
-        let tracks = data.tracks?.items || [];
-        if (tracks.length === 0) return null;
+  const query = encodeURIComponent(`track:${songName} artist:${artistName}`);
 
-        // Filter by song age
-        if (songAge && !songAge.includes('Any')) {
-            const minYear  = new Date().getFullYear() - (parseInt(songAge) || 10);
-            const filtered = tracks.filter(t => parseInt(t.album.release_date?.substring(0,4)||0) >= minYear);
-            if (filtered.length > 0) tracks = filtered;
-        }
+  try {
+    const response = await fetch(
+      `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1&market=MY`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-        // Filter explicit
-        if (!allowExplicit) {
-            const filtered = tracks.filter(t => !t.explicit);
-            if (filtered.length > 0) tracks = filtered;
-        }
+    const data   = await response.json();
+    const tracks = data.tracks?.items || [];
+    return tracks[0] || null;
 
-        // Return single random track from top 10
-        return tracks[Math.floor(Math.random() * Math.min(tracks.length, 10))];
-
-    } catch (err) {
-        console.error('Recommendation error:', err);
-        return null;
-    }
+  } catch (err) {
+    console.error("Spotify search error:", err);
+    return null;
+  }
 }
 
 // ── TOP CHARTS (keep your existing working version) ───────────────────────────

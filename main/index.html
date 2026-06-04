@@ -139,6 +139,10 @@
                                                 <option>Any</option>
                                                 <option>English</option>
                                                 <option>Malay</option>
+                                                <option>Mandarin</option>
+                                                <option>Indonesian</option>
+                                                <option>Japanese</option>
+                                                <option>Korean</option>
                                             </select>
                                         </div>
 
@@ -184,6 +188,12 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Recommended For You</h6>
                                 </div>
                                 <div class="card-body flex-column">
+
+                                    <!-- Add this inside your result card -->
+                                <div id="loadingSpinner" style="display:none;" class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                                    <span class="ml-2">Finding your song...</span>
+                                </div>
 
                                     <!-- Song card -->
                                     <div class="card bg-light border-3 mb-3">

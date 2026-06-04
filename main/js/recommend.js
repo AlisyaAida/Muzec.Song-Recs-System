@@ -4,11 +4,12 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/fi
 import {
   collection, addDoc, query, where, getDocs, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { fetchSpotifyRecommendations } from "./spotify-service.js";
+import { getGeminiRecommendation, searchSpotifyForSong } from "./spotify-service.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   let currentUser  = null;
   let currentTrack = null;
+  let songHistory  = [];
 
   onAuthStateChanged(auth, (user) => {
     if (user) { currentUser = user; }
@@ -26,56 +27,101 @@ document.addEventListener("DOMContentLoaded", function () {
   const addToFavBtn     = document.getElementById("favBtn");
   const youtubeBtn      = document.getElementById("youtubeBtn");
   const anotherBtn      = document.getElementById("anotherBtn");
+  const spinner   = document.getElementById("loadingSpinner");
+  const songImage = document.getElementById("songImage");
+  const songYear  = document.getElementById("songYear");
+  const aiReason  = document.getElementById("aiReason");
 
   songTitle.textContent  = "Ready to discover?";
   artistName.textContent = "Select your preferences and press button above!";
 
-  // ── RECOMMEND ───────────────────────────────────────────────────────────────
+async function getRecommendation() {
+  const mood     = document.getElementById("mood").value;
+  const genre    = document.getElementById("genre").value;
+  const language = document.getElementById("language").value;
+  const songAge  = document.getElementById("songAge").value;
+  const explicit = document.querySelector(
+    'input[name="appropriate"]:checked'
+  ).value === "explicit";
+
+  spinner.style.display = "block";
+  recommendBtn.disabled = true;
+
+  try {
+    // Step 1 — Ask Gemini what song to recommend
+    const aiSuggestion = await getGeminiRecommendation(
+      mood, genre, language, songAge, explicit, songHistory
+    );
+
+    if (!aiSuggestion) {
+      alert("Could not get AI recommendation. Try again.");
+      return;
+    }
+
+    console.log("Gemini suggests:", aiSuggestion);
+
+    // Step 2 — Find that song on Spotify for metadata
+    const track = await searchSpotifyForSong(
+      aiSuggestion.name,
+      aiSuggestion.artist
+    );
+
+    // Step 3 — Display result
+    if (track) {
+      // Spotify found the song — use full metadata
+      document.getElementById("songName").textContent   = track.name;
+      document.getElementById("artistName").textContent = track.artists[0].name;
+
+      const songYearEl = document.getElementById("songYear");
+      if (songYearEl) songYearEl.textContent = track.album.release_date?.substring(0, 4) || "";
+
+      const img = document.getElementById("songImage");
+      if (img && track.album.images?.[0]?.url) {
+      img.src           = track.album.images[0].url;
+      img.style.display = "block";
+    }
+    
+      const ytQuery = encodeURIComponent(
+        `${track.name} ${track.artists[0].name}`
+      );
+      document.getElementById("youtubeBtn").href =
+        `https://www.youtube.com/results?search_query=${ytQuery}`;
+
+      currentTrack = track;
+
+      if (aiSuggestion?.name) {
+        songHistory.push(aiSuggestion.name);
+        if (songHistory.length > 5) songHistory.shift(); // keep only last 5
+}
+
+    } else {
+      // Spotify couldn't find it — show AI text only
+      document.getElementById("songName").textContent   = aiSuggestion.name;
+      document.getElementById("artistName").textContent = aiSuggestion.artist;
+    }
+
+    const reasonEl = document.getElementById("aiReason");
+    if (reasonEl) reasonEl.textContent = `"${aiSuggestion.reason}"`;
+
+    resetRating();
+    resetFavBtn();
+
+  } catch (err) {
+    console.error("Recommendation error:", err);
+    alert("Something went wrong. Make sure your server is running.");
+  } finally {
+    spinner.style.display = "none";
+    recommendBtn.disabled = false;
+  }
+}
+
   if (recommendBtn) {
-    recommendBtn.addEventListener("click", async function () {
-      const chosenMood     = document.getElementById("mood").value;
-      const chosenGenre    = document.getElementById("genre").value;
-      const chosenSongAge  = document.getElementById("songAge").value;
-      const allowExplicit  = document.getElementById("app2").checked;
-
-      recommendBtn.disabled = true;
-      recommendBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing Vibe...`;
-      songTitle.textContent  = "Loading...";
-      artistName.textContent = "";
-
-      try {
-        const track = await fetchSpotifyRecommendations(chosenGenre, chosenMood, chosenSongAge, allowExplicit);
-
-        if (track) {
-          currentTrack           = track;
-          songTitle.textContent  = track.name;
-          artistName.textContent = track.artists.map(a => a.name).join(', ');
-          resetRating();
-
-          // Reset fav button
-          if (addToFavBtn) {
-            addToFavBtn.innerHTML = '<i class="fas fa-heart"></i> Favorites';
-            addToFavBtn.classList.replace("btn-success", "btn-outline-danger");
-          }
-        } else {
-          songTitle.textContent  = "No song found.";
-          artistName.textContent = "Try changing your genre or mood.";
-        }
-      } catch (err) {
-        console.error(err);
-        showToast("Failed to communicate with Spotify.", "danger");
-      } finally {
-        recommendBtn.disabled = false;
-        recommendBtn.innerHTML = `<i class="fas fa-star"></i> Get Recommendation`;
-      }
-    });
+    recommendBtn.addEventListener("click", getRecommendation);
   }
 
-  // ── ANOTHER ─────────────────────────────────────────────────────────────────
+  // ── ANOTHER
   if (anotherBtn) {
-    anotherBtn.addEventListener("click", function () {
-      recommendBtn.click();
-    });
+    anotherBtn.addEventListener("click", getRecommendation);
   }
 
   // ── YOUTUBE ─────────────────────────────────────────────────────────────────
@@ -183,6 +229,12 @@ document.addEventListener("DOMContentLoaded", function () {
     likeBtn.classList.add("btn-outline-success");
     dislikeBtn.classList.remove("btn-danger");
     dislikeBtn.classList.add("btn-outline-danger");
+  }
+
+  function resetFavBtn() {
+  if (!addToFavBtn) return;
+  addToFavBtn.innerHTML = '<i class="fas fa-heart"></i> Favorites';
+  addToFavBtn.classList.replace("btn-success", "btn-outline-danger");
   }
   function toggleLike() {
     if (likeBtn.classList.contains("btn-success")) { resetRating(); return; }
