@@ -66,11 +66,26 @@ async function getRecommendation() {
       aiSuggestion.artist
     );
 
+    resetFavBtn();
+    resetRating();
+    
+
     // Step 3 — Display result
     if (track) {
-      // Spotify found the song — use full metadata
+      //Spotify metadata to show info
       document.getElementById("songName").textContent   = track.name;
       document.getElementById("artistName").textContent = track.artists[0].name;
+
+    const img1         = document.getElementById("songImage");
+    const spotifyLink = document.getElementById("spotifyLink");
+    const placeholder = document.getElementById("albumPlaceholder");
+
+    if (track.album.images?.[0]?.url) {
+      img1.src                    = track.album.images[0].url;
+      spotifyLink.href           = track.external_urls?.spotify || "#";
+      spotifyLink.style.removeProperty("display");
+      placeholder.style.display  = "none";
+    }
 
       const songYearEl = document.getElementById("songYear");
       if (songYearEl) songYearEl.textContent = track.album.release_date?.substring(0, 4) || "";
@@ -103,8 +118,7 @@ async function getRecommendation() {
     const reasonEl = document.getElementById("aiReason");
     if (reasonEl) reasonEl.textContent = `"${aiSuggestion.reason}"`;
 
-    resetRating();
-    resetFavBtn();
+    
 
   } catch (err) {
     console.error("Recommendation error:", err);
@@ -119,12 +133,12 @@ async function getRecommendation() {
     recommendBtn.addEventListener("click", getRecommendation);
   }
 
-  // ── ANOTHER
+  //ANOTHER
   if (anotherBtn) {
     anotherBtn.addEventListener("click", getRecommendation);
   }
 
-  // ── YOUTUBE ─────────────────────────────────────────────────────────────────
+  //YOUTUBE
   if (youtubeBtn) {
     youtubeBtn.addEventListener("click", function (e) {
       e.preventDefault();
@@ -137,7 +151,7 @@ async function getRecommendation() {
   if (likeBtn)    likeBtn.addEventListener("click", toggleLike);
   if (dislikeBtn) dislikeBtn.addEventListener("click", toggleDislike);
 
-  // ── FAVORITES ────────────────────────────────────────────────────────────────
+  //FAVORITES
   if (addToFavBtn) {
     addToFavBtn.addEventListener("click", async function () {
       if (!currentUser) { alert("You must be logged in."); return; }
@@ -169,7 +183,7 @@ async function getRecommendation() {
     });
   }
 
-  // ── SUBMIT REVIEW ────────────────────────────────────────────────────────────
+  // SUBMIT REVIEW
   if (submitReviewBtn) {
     submitReviewBtn.addEventListener("click", async function () {
       if (!currentUser) { showToast("Please log in to submit a review.", "danger"); return; }
@@ -200,7 +214,7 @@ async function getRecommendation() {
     });
   }
 
-  // ── VIEW REVIEWS ─────────────────────────────────────────────────────────────
+  //VIEW REVIEWS
   if (viewReviewsBtn) {
     viewReviewsBtn.addEventListener("click", async function () {
       const name   = songTitle.textContent.trim();
@@ -223,7 +237,7 @@ async function getRecommendation() {
     });
   }
 
-  // ── HELPERS ───────────────────────────────────────────────────────────────────
+  //HELPERS 
   function resetRating() {
     likeBtn.classList.remove("btn-success");
     likeBtn.classList.add("btn-outline-success");
@@ -235,7 +249,14 @@ async function getRecommendation() {
   if (!addToFavBtn) return;
   addToFavBtn.innerHTML = '<i class="fas fa-heart"></i> Favorites';
   addToFavBtn.classList.replace("btn-success", "btn-outline-danger");
+  //reset spotify link and image if new recommendation is pressed
+    const spotifyLink = document.getElementById("spotifyLink");
+    const placeholder = document.getElementById("albumPlaceholder");
+    if (spotifyLink) spotifyLink.style.display = "none";
+    if (placeholder) placeholder.style.display = "block";
   }
+
+
   function toggleLike() {
     if (likeBtn.classList.contains("btn-success")) { resetRating(); return; }
     resetRating(); likeBtn.classList.replace("btn-outline-success", "btn-success");

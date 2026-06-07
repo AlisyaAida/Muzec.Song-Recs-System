@@ -195,14 +195,32 @@
                                     <span class="ml-2">Finding your song...</span>
                                 </div>
 
-                                    <!-- Song card -->
-                                    <div class="card bg-light border-3 mb-3">
-                                        <div class="card-body text-center p-3 pt-2">
-                                            <i class="fas fa-fw fa-music"></i>
-                                            <h4 id="songName" class="card-title text-dark mb-1"></h4>
-                                            <p id="artistName" class="text-muted mb-2"></p>
+                                    <!-- Result content -->
+                                <div class="card bg-light border-3 mb-3">
+                                    <div class="card-body text-center p-3 pt-2">
+        
+                                        <!-- Album art — hidden until a song is recommended -->
+                                         <a id="spotifyLink" href="#" target="_blank" 
+                                            class="d-block text-center"
+                                            style="display:none !important;">
+                                            <img id="songImage" 
+                                                src="" 
+                                                alt="Album Cover"
+                                                style="width:180px; height:180px; object-fit:cover; 
+                                                    border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
+                                                    margin-bottom:12px; cursor:pointer;">
+                                        </a>
+
+                                        <!-- Placeholder icon shown before recommendation -->
+                                        <div id="albumPlaceholder" class="mb-2">
+                                            <i class="fas fa-music fa-4x text-muted"></i>
                                         </div>
+
+                                        <h4 id="songName" class="card-title text-dark mb-1">Ready to discover?</h4>
+                                        <p id="artistName" class="text-muted mb-2">Select your preferences and click Get Recommendation!</p>
+                                        <p id="aiReason" class="text-muted small fst-italic mt-1"></p>
                                     </div>
+                                </div>
 
                                     <!-- Rating -->
                                     <div class="row g-0 mb-3">
@@ -222,7 +240,7 @@
                                     <div class="d-grid gap-2 mt-auto">
                                         <div class="row g-2">
                                             <div class="col-4">
-                                                <a id="youtubeBtn" href="#" class="btn btn-danger w-100 text-white">
+                                                <a id="youtubeBtn" href="#" class="btn btn-danger w-100 text-white py-1">
                                                     <i class="fab fa-youtube"></i> YouTube
                                                 </a>
                                             </div>
@@ -232,7 +250,7 @@
                                                 </button>
                                             </div>
                                             <div class="col-4">
-                                                <button type="button" id="anotherBtn" class="btn btn-warning w-100 text-white">
+                                                <button type="button" id="anotherBtn" class="btn btn-warning w-100 text-white py-1">
                                                     <i class="fas fa-redo"></i> Another
                                                 </button>
                                             </div>
@@ -297,12 +315,7 @@
             <!-- Custom scripts for all pages-->
             <script src="js/sb-admin-2.min.js"></script>
 
-            <!-- Page level plugins -->
-            <script src="vendor/chart.js/Chart.min.js"></script>
-
-            <!-- Page level custom scripts -->
-            <script src="js/demo/chart-area-demo.js"></script>
-            <script src="js/demo/chart-pie-demo.js"></script>
+        
 
             
             <script type="module" src="js/recommend.js"></script>

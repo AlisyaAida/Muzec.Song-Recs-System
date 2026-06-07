@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const email    = emailInput.value.trim();
     const password = passInput.value.trim();
 
-    // Basic validation
+    //user validation
     if (!email || !password) {
       showError("Please fill in both fields.");
       return;
