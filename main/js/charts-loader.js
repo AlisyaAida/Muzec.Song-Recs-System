@@ -1,5 +1,10 @@
 // js/charts-loader.js
 import { fetchTopChartsByGenre } from "./spotify-service.js";
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { doc, getDoc }
+  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 async function populateChartCard(genreName, containerId) {
     const container = document.getElementById(containerId);
@@ -29,6 +34,21 @@ async function populateChartCard(genreName, containerId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "login.html"; return; }
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const navUsername = document.getElementById("navUsername");
+        if (navUsername) navUsername.textContent = userDoc.data().firstName || user.email;
+      }
+    } catch (err) {
+      console.error("Navbar error:", err);
+    }
+  });
+
     populateChartCard("Pop", "pop-chart-container");
     populateChartCard("Rock", "rock-chart-container");
     populateChartCard("Hip-Hop", "hiphop-chart-container");

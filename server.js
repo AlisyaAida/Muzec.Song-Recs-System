@@ -16,7 +16,7 @@ const PORT          = process.env.PORT || 3000;
 
 console.log("ID:", CLIENT_ID, "SECRET:", CLIENT_SECRET);
 
-// ── Spotify Token ─────────────────────────────────────────────────────────────
+//Spotify Token
 app.get("/api/token", async (req, res) => {
   try {
     const credentials = Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64");
@@ -46,6 +46,13 @@ app.post("/api/recommend", async (req, res) => {
   console.log("Request body:", req.body);
   console.log("GEMINI_API_KEY exists:", !!GEMINI_API_KEY);
 
+const yearMap = {
+  "Up to 10 years": 2015,
+  "Up to 20 years": 2005,
+  "Up to 30 years": 1995,
+};
+const sinceYear = yearMap[songAge] ?? 1900;
+
 const randomSeed  = Math.floor(Math.random() * 10000);
 const avoidList = songHistory && songHistory.length > 0
   ? `- Do NOT recommend any of these songs you already recommended:\n${songHistory.map(s => `  * "${s}"`).join("\n")}`
@@ -61,6 +68,7 @@ Recommend ONE real song based on these preferences:
 - Explicit allowed: ${allowExplicit ? "Yes" : "No"}
 - Variation seed: ${randomSeed}
 
+
 Rules:
 - The song MUST actually exist on Spotify
 - Match the mood genuinely, not just by song title
@@ -68,12 +76,9 @@ Rules:
 - If language is "Korean", recommend a Korean song
 - If language is "Japanese", recommend a Japanese song
 - If explicit is No, only recommend clean songs
-- If song age is "Up to 10 years", only songs from 2015 onwards
-- If song age is "Up to 20 years", only songs from 2005 onwards
-- If song age is "Up to 30 years", only songs from 1995 onwards
+- Only songs released after ${sinceYear}
 - Do NOT always recommend the most popular or well-known song
-- Vary your recommendations — explore deeper cuts and hidden gems
-${avoidList}
+- Use the variation seed ${randomSeed} to pick non-obvious songs
 
 Respond ONLY in this exact JSON format, nothing else, no markdown:
 {
@@ -84,13 +89,15 @@ Respond ONLY in this exact JSON format, nothing else, no markdown:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents:         [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.8 }
+          generationConfig: {
+    temperature: 0.8 
+  }
         })
       }
     );
@@ -116,7 +123,7 @@ Respond ONLY in this exact JSON format, nothing else, no markdown:
   }
 });
 
-// ── Start Server ──────────────────────────────────────────────────────────────
+//Start Server
 app.listen(PORT, () => {
   console.log("Muzec server running at http://localhost:" + PORT);
 });

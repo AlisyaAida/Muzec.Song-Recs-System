@@ -2,7 +2,7 @@
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import {
-  collection, addDoc, query, where, getDocs, orderBy, serverTimestamp
+  collection, addDoc, query, where, getDocs, orderBy, serverTimestamp, getDoc, doc
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { getGeminiRecommendation, searchSpotifyForSong } from "./spotify-service.js";
 
@@ -11,10 +11,26 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentTrack = null;
   let songHistory  = [];
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) { currentUser = user; }
-    else { window.location.href = "login.html"; }
-  });
+// REPLACE WITH this
+onAuthStateChanged(auth, async (user) => {
+  if (!user) { 
+    window.location.href = "login.html"; 
+    return;
+  }
+  currentUser = user;
+
+  // Fetch name from Firestore
+  try {
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      const navUsername = document.getElementById("navUsername");
+      if (navUsername) navUsername.textContent = data.firstName || user.email;
+    }
+  } catch (err) {
+    console.error("Error fetching username:", err);
+  }
+});
 
   const submitReviewBtn = document.getElementById("submitReviewBtn");
   const viewReviewsBtn  = document.getElementById("viewReviewsBtn");
@@ -83,8 +99,8 @@ async function getRecommendation() {
     if (track.album.images?.[0]?.url) {
       img1.src                    = track.album.images[0].url;
       spotifyLink.href           = track.external_urls?.spotify || "#";
-      spotifyLink.style.removeProperty("display");
-      placeholder.style.display  = "none";
+      spotifyLink.style.display  = "none";
+      placeholder.style.display  = "flex";
     }
 
       const songYearEl = document.getElementById("songYear");
