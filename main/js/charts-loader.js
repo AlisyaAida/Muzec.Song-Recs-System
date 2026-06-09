@@ -6,6 +6,7 @@ import { onAuthStateChanged }
 import { doc, getDoc }
   from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+  //heyho
 async function populateChartCard(genreName, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
