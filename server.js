@@ -123,6 +123,51 @@ Respond ONLY in this exact JSON format, nothing else, no markdown:
   }
 });
 
+// ── Charts (one Gemini call for all genres) ───────────────────────────────────
+app.get("/api/charts", async (req, res) => {
+const prompt = `You are a music expert. For each of these genres: Pop, Rock, Hip-Hop, Jazz, Classical, K-Pop, R&B, Indie — list the 20 most popular songs right now.
+
+Respond ONLY in this exact JSON format, nothing else, no markdown:
+{
+  "Pop":       [{ "name": "Song Name", "artist": "Artist Name" }],
+  "Rock":      [{ "name": "Song Name", "artist": "Artist Name" }],
+  "Hip-Hop":   [{ "name": "Song Name", "artist": "Artist Name" }],
+  "Jazz":      [{ "name": "Song Name", "artist": "Artist Name" }],
+  "Classical": [{ "name": "Song Name", "artist": "Artist Name" }],
+  "K-Pop":     [{ "name": "Song Name", "artist": "Artist Name" }],
+  "R&B":       [{ "name": "Song Name", "artist": "Artist Name" }],
+  "Indie":     [{ "name": "Song Name", "artist": "Artist Name" }]
+}
+
+Each array must contain exactly 20 song objects.`;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.1 }
+        })
+      }
+    );
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return res.status(500).json({ error: "No response from Gemini" });
+
+    const clean  = text.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    res.json(parsed);
+
+  } catch (err) {
+    console.error("Charts error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 //Start Server
 app.listen(PORT, () => {
   console.log("Muzec server running at http://localhost:" + PORT);

@@ -1,61 +1,130 @@
 // js/charts-loader.js
-import { fetchTopChartsByGenre } from "./spotify-service.js";
 import { auth, db } from "./firebase-config.js";
-import { onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { doc, getDoc }
-  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-  //heyho
-async function populateChartCard(genreName, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
+const CACHE_KEY    = "muzec_charts_cache";
+const CACHE_EXPIRY = "muzec_charts_expiry";
 
-    const tracks = await fetchTopChartsByGenre(genreName);
+let currentUser = null;
 
-    if (!tracks || tracks.length === 0) {
-        container.innerHTML = `<li class="list-group-item text-danger small text-center">Charts offline</li>`;
-        return;
-    }
+onAuthStateChanged(auth, (user) => {
+  if (!user) { window.location.href = "login.html"; return; }
+  currentUser = user;
+  loadTopChartsPage();
+});
 
-    container.innerHTML = ""; // Clear loader spinner
-
-    tracks.forEach(track => {
-        const itemRow = document.createElement("li");
-        itemRow.className = "list-group-item d-flex justify-content-between align-items-start";
-        itemRow.innerHTML = `
-            <div class="ms-2 me-auto">
-              <div class="fw-semibold text-dark">${track.name}</div>
-              <small class="text-muted">${track.artists.map(a => a.name).join(", ")}</small>
-            </div>
-            <button class="btn btn-sm btn-outline-danger" title="Add to favorites"><i class="fas fa-heart"></i></button>
-        `;
-        container.appendChild(itemRow);
-    });
+async function loadAllCharts() {
+  const cached = sessionStorage.getItem(CACHE_KEY);
+  const expiry = sessionStorage.getItem(CACHE_EXPIRY);
+  if (cached && expiry && Date.now() < parseInt(expiry)) {
+    return JSON.parse(cached);
+  }
+  try {
+    const response = await fetch("http://localhost:3000/api/charts");
+    const data     = await response.json();
+    if (data.error) return null;
+    sessionStorage.setItem(CACHE_KEY,    JSON.stringify(data));
+    sessionStorage.setItem(CACHE_EXPIRY, Date.now() + (60 * 60 * 1000));
+    return data;
+  } catch (err) {
+    console.error("Charts load error:", err);
+    return null;
+  }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+async function loadTopChartsPage() {
+  const allCharts = await loadAllCharts();
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) { window.location.href = "login.html"; return; }
+  const containers = {
+    "Pop":       "pop-chart-container",
+    "Rock":      "rock-chart-container",
+    "Hip-Hop":   "hiphop-chart-container",
+    "Jazz":      "jazz-chart-container",
+    "Classical": "classical-chart-container",
+    "K-Pop":     "kpop-chart-container",
+    "R&B":       "rnb-chart-container",
+    "Indie":     "indie-chart-container",
+  };
 
-    try {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const navUsername = document.getElementById("navUsername");
-        if (navUsername) navUsername.textContent = userDoc.data().firstName || user.email;
-      }
-    } catch (err) {
-      console.error("Navbar error:", err);
+  for (const [genre, containerId] of Object.entries(containers)) {
+    const container = document.getElementById(containerId);
+    if (!container) continue;
+
+    if (!allCharts || !allCharts[genre]) {
+      container.innerHTML = `<li class="list-group-item text-danger small text-center">Charts offline</li>`;
+      continue;
     }
-  });
 
-    populateChartCard("Pop", "pop-chart-container");
-    populateChartCard("Rock", "rock-chart-container");
-    populateChartCard("Hip-Hop", "hiphop-chart-container");
-    populateChartCard("Jazz", "jazz-chart-container");
-    populateChartCard("Classical", "classical-chart-container");
-    populateChartCard("K-Pop", "kpop-chart-container");
-    populateChartCard("R&B", "rnb-chart-container");
-    populateChartCard("Indie", "indie-chart-container");
-});
+    // Show only top 3 on the overview page
+    const songs = allCharts[genre].slice(0, 3);
+    container.innerHTML = "";
+    songs.forEach(song => {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-center";
+      li.innerHTML = `
+        <div>
+          <div class="fw-semibold text-dark small">${escapeHTML(song.name)}</div>
+          <small class="text-muted">${escapeHTML(song.artist)}</small>
+        </div>
+        <button class="btn btn-sm btn-outline-danger fav-btn flex-shrink-0"
+          data-name="${escapeHTML(song.name)}"
+          data-artist="${escapeHTML(song.artist)}"
+          title="Add to favorites">
+          <i class="fas fa-heart"></i>
+        </button>`;
+      container.appendChild(li);
+    });
+
+    // Wire up favorite buttons for this container
+    container.querySelectorAll(".fav-btn").forEach(btn => {
+      btn.addEventListener("click", () => handleFavorite(btn));
+    });
+  }
+}
+
+async function handleFavorite(btn) {
+  if (!currentUser) { alert("Please log in first."); return; }
+
+  const name   = btn.dataset.name;
+  const artist = btn.dataset.artist;
+
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+
+  try {
+    const favsRef  = collection(db, "users", currentUser.uid, "favorites");
+    const existing = await getDocs(query(favsRef, where("name", "==", name)));
+
+    if (!existing.empty) {
+      btn.innerHTML = `<i class="fas fa-heart"></i>`;
+      btn.classList.replace("btn-outline-danger", "btn-danger");
+      btn.disabled = false;
+      btn.title    = "Already in favorites";
+      return;
+    }
+
+    await addDoc(favsRef, {
+      name, artist,
+      albumArt:   "",
+      spotifyUrl: "",
+      addedAt:    serverTimestamp()
+    });
+
+    btn.innerHTML = `<i class="fas fa-heart"></i>`;
+    btn.classList.replace("btn-outline-danger", "btn-danger");
+    btn.title    = "Added!";
+    btn.disabled = false;
+
+  } catch (err) {
+    console.error("Favorite error:", err);
+    btn.innerHTML = `<i class="fas fa-heart"></i>`;
+    btn.disabled  = false;
+  }
+}
+
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
