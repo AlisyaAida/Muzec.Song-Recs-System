@@ -27,7 +27,17 @@ app.get("/api/token", async (req, res) => {
         "Content-Type":  "application/x-www-form-urlencoded"
       },
       body: "grant_type=client_credentials"
+
     });
+ if (response.status === 429) {
+      const retryAfter = response.headers.get("Retry-After") || 5;
+      console.warn(`Token rate limited. Wait ${retryAfter}s`);
+      return res.status(429).json({ 
+        error: "Rate limited", 
+        retryAfter: parseInt(retryAfter) 
+      });
+    }
+
     const data = await response.json();
     if (!data.access_token) { return res.status(500).json({ error: "Failed" }); }
     res.json({ access_token: data.access_token });
@@ -89,7 +99,7 @@ Respond ONLY in this exact JSON format, nothing else, no markdown:
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method:  "POST",
         headers: { "Content-Type": "application/json" },

@@ -4,18 +4,27 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/fi
 import { collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { searchSpotifyForSong } from "./spotify-service.js";
 
-// ── Session cache key ─────────────────────────────────────────────────────────
+//Session cache key
 const CACHE_KEY    = "muzec_charts_cache";
 const CACHE_EXPIRY = "muzec_charts_expiry";
 
 let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
-  if (user) { currentUser = user; }
-  else { window.location.href = "login.html"; }
+  if (!user) { window.location.href = "login.html"; return; }
+try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const navUsername = document.getElementById("navUsername");
+        if (navUsername) navUsername.textContent = userDoc.data().firstName || user.email;
+      }
+    } catch (err) {
+      console.error("Navbar error:", err);
+    }
+
 });
 
-// ── Load charts from server (cached per session) ──────────────────────────────
+//Load charts from server (cached per session)
 async function loadAllCharts() {
   // Check session cache first
   const cached  = sessionStorage.getItem(CACHE_KEY);
@@ -39,7 +48,7 @@ async function loadAllCharts() {
   }
 }
 
-// ── Populate table for the current genre page ─────────────────────────────────
+//Populate table for the current genre page
 export async function populateGenreChart(genre) {
   const tbody = document.getElementById("chartTableBody");
   if (!tbody) return;

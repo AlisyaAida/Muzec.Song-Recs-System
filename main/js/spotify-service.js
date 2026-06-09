@@ -2,21 +2,28 @@
 
 // ── GET TOKEN from local server (browser cannot call Spotify token endpoint directly) ──
 export async function getSpotifyToken() {
-    const token  = sessionStorage.getItem('spotify_token');
-    const expiry = sessionStorage.getItem('spotify_expiry');
-    if (token && expiry && Date.now() < parseInt(expiry)) return token;
+  const token  = sessionStorage.getItem("spotify_token");
+  const expiry = sessionStorage.getItem("spotify_expiry");
 
-    try {
-        const response = await fetch('http://localhost:3000/api/token');
-        const data = await response.json();
-        if (!data.access_token) { console.error('Token error:', data); return null; }
-        sessionStorage.setItem('spotify_token',  data.access_token);
-        sessionStorage.setItem('spotify_expiry', Date.now() + (55 * 60 * 1000));
-        return data.access_token;
-    } catch (err) {
-        console.error('Auth error:', err);
-        return null;
-    }
+  // Reuse existing token if still valid
+  if (token && expiry && Date.now() < parseInt(expiry)) {
+    return token; // ← returns cached token, no new request
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/api/token");
+    const data     = await response.json();
+    if (!data.access_token) return null;
+
+    // Cache for 55 minutes
+    sessionStorage.setItem("spotify_token",  data.access_token);
+    sessionStorage.setItem("spotify_expiry", Date.now() + (55 * 60 * 1000));
+    return data.access_token;
+
+  } catch (err) {
+    console.error("Auth error:", err);
+    return null;
+  }
 }
 
 // ── GENRE + MOOD MAPS ─────────────────────────────────────────────────────────
@@ -58,20 +65,49 @@ export async function searchSpotifyForSong(songName, artistName) {
 
   const query = encodeURIComponent(`track:${songName} artist:${artistName}`);
 
-  try {
-    const response = await fetch(
-      `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1&market=MY`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await fetch(
+        `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1&market=MY`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    const data   = await response.json();
-    const tracks = data.tracks?.items || [];
-    return tracks[0] || null;
+      // ── Handle rate limit ──────────────────────────────
+      if (response.status === 429) {
 
-  } catch (err) {
-    console.error("Spotify search error:", err);
-    return null;
+        // READ the Retry-After header Spotify sends
+        const retryAfter = response.headers.get("Retry-After");
+
+        // Convert to milliseconds (header value is in seconds)
+        const waitMs = retryAfter 
+          ? parseInt(retryAfter) * 1000   // use Spotify's exact value
+          : attempt * 2000;               // fallback: 2s, 4s, 6s
+
+        console.warn(`Rate limited. Spotify says wait ${retryAfter || "unknown"}s. Waiting ${waitMs/1000}s (attempt ${attempt}/3)`);
+
+        // Wait exactly as long as Spotify says
+        await new Promise(resolve => setTimeout(resolve, waitMs));
+        continue; // retry after waiting
+      }
+      // ──────────────────────────────────────────────────
+
+      if (!response.ok) {
+        console.error("Spotify search failed:", response.status);
+        return null;
+      }
+
+      const data   = await response.json();
+      const tracks = data.tracks?.items || [];
+      return tracks[0] || null;
+
+    } catch (err) {
+      console.error(`Attempt ${attempt} failed:`, err.message);
+      if (attempt === 3) return null;
+      await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+    }
   }
+
+  return null;
 }
 
 // ── TOP CHARTS (keep your existing working version) ───────────────────────────

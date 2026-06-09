@@ -10,7 +10,16 @@ let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
   if (!user) { window.location.href = "login.html"; return; }
-  currentUser = user;
+try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const navUsername = document.getElementById("navUsername");
+        if (navUsername) navUsername.textContent = userDoc.data().firstName || user.email;
+      }
+    } catch (err) {
+      console.error("Navbar error:", err);
+    }
+    
   loadTopChartsPage();
 });
 

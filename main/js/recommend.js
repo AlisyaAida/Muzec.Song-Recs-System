@@ -41,7 +41,6 @@ onAuthStateChanged(auth, async (user) => {
   const likeBtn         = document.getElementById("likeBtn");
   const dislikeBtn      = document.getElementById("dislikeBtn");
   const addToFavBtn     = document.getElementById("favBtn");
-  const youtubeBtn      = document.getElementById("youtubeBtn");
   const anotherBtn      = document.getElementById("anotherBtn");
   const spinner   = document.getElementById("loadingSpinner");
   const songImage = document.getElementById("songImage");
@@ -73,9 +72,10 @@ async function getRecommendation() {
       alert("Could not get AI recommendation. Try again.");
       return;
     }
+  
 
     console.log("Gemini suggests:", aiSuggestion);
-
+    await new Promise(resolve => setTimeout(resolve, 500));
     // Step 2 — Find that song on Spotify for metadata
     const track = await searchSpotifyForSong(
       aiSuggestion.name,
@@ -92,15 +92,15 @@ async function getRecommendation() {
       document.getElementById("songName").textContent   = track.name;
       document.getElementById("artistName").textContent = track.artists[0].name;
 
-    const img1         = document.getElementById("songImage");
+    const img1        = document.getElementById("songImage");
     const spotifyLink = document.getElementById("spotifyLink");
     const placeholder = document.getElementById("albumPlaceholder");
 
     if (track.album.images?.[0]?.url) {
       img1.src                    = track.album.images[0].url;
       spotifyLink.href           = track.external_urls?.spotify || "#";
-      spotifyLink.style.display  = "none";
-      placeholder.style.display  = "flex";
+      spotifyLink.style.display  = "block";
+      placeholder.style.display  = "none";
     }
 
       const songYearEl = document.getElementById("songYear");
@@ -112,11 +112,13 @@ async function getRecommendation() {
       img.style.display = "block";
     }
     
-      const ytQuery = encodeURIComponent(
-        `${track.name} ${track.artists[0].name}`
-      );
-      document.getElementById("youtubeBtn").href =
-        `https://www.youtube.com/results?search_query=${ytQuery}`;
+      const spotifyBtn = document.getElementById("spotifyBtn");
+      if (spotifyBtn) {
+      spotifyBtn.href = track.external_urls?.spotify || "#";
+    }
+
+    //  document.getElementById("youtubeBtn").href =
+      //  `https://www.youtube.com/results?search_query=${ytQuery}`;
 
       currentTrack = track;
 
@@ -152,16 +154,6 @@ async function getRecommendation() {
   //ANOTHER
   if (anotherBtn) {
     anotherBtn.addEventListener("click", getRecommendation);
-  }
-
-  //YOUTUBE
-  if (youtubeBtn) {
-    youtubeBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (!currentTrack) { showToast("Get a recommendation first!", "warning"); return; }
-      const q = encodeURIComponent(`${currentTrack.name} ${currentTrack.artists[0].name} official`);
-      window.open(`https://www.youtube.com/results?search_query=${q}`, "_blank");
-    });
   }
 
   if (likeBtn)    likeBtn.addEventListener("click", toggleLike);
@@ -215,7 +207,7 @@ async function getRecommendation() {
         const reviewsRef = collection(db, "reviews", songKey, "entries");
         await addDoc(reviewsRef, {
           songName: name, artistName: artist, reviewText: text,
-          username: currentUser.displayName || currentUser.email || "Anonymous",
+          username: await getUserFullName(currentUser.uid),
           uid: currentUser.uid, createdAt: serverTimestamp()
         });
         reviewText.value = "";
@@ -272,62 +264,248 @@ async function getRecommendation() {
     if (placeholder) placeholder.style.display = "block";
   }
 
+  //Get full name from Firestore
+async function getUserFullName(uid) {
+  try {
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      return `${data.firstName} ${data.lastName}`.trim() || "Anonymous";
+    }
+  } catch (err) {
+    console.error("Error fetching name:", err);
+  }
+  return "Anonymous";
+}
 
-  function toggleLike() {
-    if (likeBtn.classList.contains("btn-success")) { resetRating(); return; }
-    resetRating(); likeBtn.classList.replace("btn-outline-success", "btn-success");
+  async function toggleLike() {
+  if (!currentUser) { showToast("Please log in first.", "danger"); return; }
+  if (!currentTrack) { showToast("Get a recommendation first!", "warning"); return; }
+
+  const isActive = likeBtn.classList.contains("btn-success");
+
+  // Reset both buttons visually
+  resetRating();
+
+  if (!isActive) {
+    // Activate like button
+    likeBtn.classList.replace("btn-outline-success", "btn-success");
+
+    // Save to Firestore
+    try {
+      const songKey    = buildSongKey(
+        songTitle.textContent, 
+        artistName.textContent
+      );
+      const reviewsRef = collection(db, "reviews", songKey, "entries");
+
+      // Remove any previous like/dislike from this user for this song
+      await removePreviousReaction(reviewsRef, currentUser.uid);
+
+      // Add new like
+      await addDoc(reviewsRef, {
+        type:       "like",
+        songName:   songTitle.textContent,
+        artistName: artistName.textContent,
+        username: await getUserFullName(currentUser.uid),
+        uid:        currentUser.uid,
+        createdAt:  serverTimestamp()
+      });
+
+      showToast("👍 Liked!", "success");
+
+    } catch (err) {
+      console.error("Like error:", err);
+      showToast("Failed to save. Try again.", "danger");
+    }
   }
-  function toggleDislike() {
-    if (dislikeBtn.classList.contains("btn-danger")) { resetRating(); return; }
-    resetRating(); dislikeBtn.classList.replace("btn-outline-danger", "btn-danger");
+}
+
+async function toggleDislike() {
+  if (!currentUser) { showToast("Please log in first.", "danger"); return; }
+  if (!currentTrack) { showToast("Get a recommendation first!", "warning"); return; }
+
+  const isActive = dislikeBtn.classList.contains("btn-danger");
+
+  resetRating();
+
+  if (!isActive) {
+    // Activate dislike button
+    dislikeBtn.classList.replace("btn-outline-danger", "btn-danger");
+
+    // Save to Firestore
+    try {
+      const songKey    = buildSongKey(
+        songTitle.textContent,
+        artistName.textContent
+      );
+      const reviewsRef = collection(db, "reviews", songKey, "entries");
+
+      // Remove any previous like/dislike from this user
+      await removePreviousReaction(reviewsRef, currentUser.uid);
+
+      // Add new dislike
+      await addDoc(reviewsRef, {
+        type:       "dislike",
+        songName:   songTitle.textContent,
+        artistName: artistName.textContent,
+        username:   await getUserFullName(currentUser.uid),
+        uid:        currentUser.uid,
+        createdAt:  serverTimestamp()
+      });
+
+      showToast("👎 Disliked!", "info");
+
+    } catch (err) {
+      console.error("Dislike error:", err);
+      showToast("Failed to save. Try again.", "danger");
+    }
   }
+}
+
+// ── Remove previous reaction from same user
+async function removePreviousReaction(reviewsRef, uid) {
+  const existing = await getDocs(
+    query(reviewsRef, where("uid", "==", uid), where("type", "in", ["like", "dislike"]))
+  );
+  existing.forEach(async (docSnap) => {
+    await deleteDoc(doc(db, reviewsRef.path, docSnap.id));
+  });
+}
+
+
   function buildSongKey(songName, artist) {
     return `${songName}__${artist}`.toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 200);
   }
-  function renderReviewsModal(songName, artist, docs) {
-    document.getElementById("reviewsModal")?.remove();
-    const reviewsHTML = docs.length === 0
-      ? `<p class="text-muted text-center py-3">No reviews yet. Be the first!</p>`
-      : docs.map(d => {
-          const data = d.data();
-          const date = data.createdAt?.toDate
-            ? data.createdAt.toDate().toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
-            : "Just now";
-          return `<div class="mb-3 p-3 rounded border bg-light">
+
+
+function renderReviewsModal(songName, artist, docs) {
+  document.getElementById("reviewsModal")?.remove();
+
+  // Separate likes, dislikes and reviews
+  const likes    = docs.filter(d => d.data().type === "like");
+  const dislikes = docs.filter(d => d.data().type === "dislike");
+  const reviews  = docs.filter(d => d.data().type === "review" || !d.data().type);
+
+  // Build likes/dislikes summary
+  const reactionHTML = (likes.length > 0 || dislikes.length > 0) ? `
+    <div class="mb-3 p-3 rounded border bg-light">
+      <strong class="text-dark">
+        <i class="fas fa-thumbs-up text-success mr-1"></i>${likes.length} Liked
+        &nbsp;&nbsp;
+        <i class="fas fa-thumbs-down text-danger mr-1"></i>${dislikes.length} Disliked
+      </strong>
+    </div>` : "";
+
+  // Build individual reaction entries
+  const reactionEntriesHTML = [...likes, ...dislikes].map(d => {
+    const data = d.data();
+    const date = data.createdAt?.toDate
+      ? data.createdAt.toDate().toLocaleDateString("en-GB", {
+          day: "numeric", month: "short", year: "numeric"
+        })
+      : "Just now";
+
+    const icon   = data.type === "like"
+      ? `<i class="fas fa-thumbs-up text-success mr-1"></i>`
+      : `<i class="fas fa-thumbs-down text-danger mr-1"></i>`;
+
+    const action = data.type === "like" ? "liked" : "disliked";
+
+    return `
+      <div class="mb-2 p-2 rounded border bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-dark">
+            ${icon}
+            <strong>${escapeHTML(data.username)}</strong> 
+            ${action} this song
+          </span>
+          <small class="text-muted">${date}</small>
+        </div>
+      </div>`;
+  }).join("");
+
+  // Build review entries
+  const reviewsHTML = reviews.length === 0
+    ? `<p class="text-muted text-center py-2">No reviews yet. Be the first!</p>`
+    : reviews.map(d => {
+        const data = d.data();
+        const date = data.createdAt?.toDate
+          ? data.createdAt.toDate().toLocaleDateString("en-GB", {
+              day: "numeric", month: "short", year: "numeric"
+            })
+          : "Just now";
+        return `
+          <div class="mb-3 p-3 rounded border bg-light">
             <div class="d-flex justify-content-between align-items-center mb-1">
-              <strong class="text-dark"><i class="fas fa-user-circle text-primary mr-1"></i>${escapeHTML(data.username)}</strong>
+              <strong class="text-dark">
+                <i class="fas fa-user-circle text-primary mr-1"></i>
+                ${escapeHTML(data.username)}
+              </strong>
               <small class="text-muted">${date}</small>
             </div>
             <p class="mb-0 text-dark">${escapeHTML(data.reviewText)}</p>
           </div>`;
-        }).join("");
-    const modal = document.createElement("div");
-    modal.id = "reviewsModal";
-    modal.innerHTML = `
-      <div class="modal fade" id="reviewsModalDialog" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-          <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(90deg, #B379E3 50%, #6EE7F2 70%);">
-              <h5 class="modal-title text-white"><i class="fas fa-comments mr-2"></i>Reviews — ${escapeHTML(songName)} by ${escapeHTML(artist)}</h5>
-              <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-              <p class="text-muted small mb-3"><i class="fas fa-info-circle mr-1"></i>${docs.length} review${docs.length !== 1 ? "s" : ""}</p>
-              ${reviewsHTML}
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
+      }).join("");
+
+  const totalCount = docs.length;
+
+  const modal = document.createElement("div");
+  modal.id = "reviewsModal";
+  modal.innerHTML = `
+    <div class="modal fade" id="reviewsModalDialog" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-header" 
+               style="background: linear-gradient(90deg, #B379E3 50%, #6EE7F2 70%);">
+            <h5 class="modal-title text-white">
+              <i class="fas fa-comments mr-2"></i>
+              Feedbacks — ${escapeHTML(songName)} by ${escapeHTML(artist)}
+            </h5>
+            <button type="button" class="close text-white" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted small mb-3">
+              <i class="fas fa-info-circle mr-1"></i>
+              ${totalCount} feedback${totalCount !== 1 ? "s" : ""}
+            </p>
+
+            <!-- Likes/Dislikes Summary -->
+            ${reactionHTML}
+
+            <!-- Individual Reactions -->
+            ${reactionEntriesHTML}
+
+            <!-- Divider if both reactions and reviews exist -->
+            ${reactionEntriesHTML && reviews.length > 0 
+              ? `<hr><p class="text-muted small mb-2">
+                   <i class="fas fa-comment mr-1"></i>Reviews
+                 </p>` 
+              : ""}
+
+            <!-- Reviews -->
+            ${reviewsHTML}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" 
+                    data-dismiss="modal">Close</button>
           </div>
         </div>
-      </div>`;
-    document.body.appendChild(modal);
-    $("#reviewsModalDialog").modal("show");
-    $("#reviewsModalDialog").on("hidden.bs.modal", () => modal.remove());
-  }
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  $("#reviewsModalDialog").modal("show");
+  $("#reviewsModalDialog").on("hidden.bs.modal", () => modal.remove());
+}
+
+
   function escapeHTML(str) {
     return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
+
   function showToast(message, type = "info") {
     document.getElementById("muzecToast")?.remove();
     const colours = { success:"#28a745", danger:"#dc3545", warning:"#ffc107", info:"#17a2b8" };
