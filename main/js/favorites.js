@@ -22,6 +22,7 @@ try {
   });
 });
 
+//for testing
 // ── LOAD FAVORITES ────────────────────────────────────────────────────────────
 
 async function loadFavorites(userId) {
