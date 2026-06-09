@@ -1,12 +1,23 @@
 import { auth, db } from "./firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import {
-  collection, getDocs, deleteDoc, doc, orderBy, query
+  collection, getDocs, deleteDoc, doc, orderBy, query, getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", function () {
-  onAuthStateChanged(auth, async (user) => {
+
+onAuthStateChanged(auth, async (user) => {
     if (!user) { window.location.href = "login.html"; return; }
+try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists()) {
+        const navUsername = document.getElementById("navUsername");
+        if (navUsername) navUsername.textContent = userDoc.data().firstName || user.email;
+      }
+    } catch (err) {
+      console.error("Navbar error:", err);
+    }
+
     await loadFavorites(user.uid);
   });
 });
