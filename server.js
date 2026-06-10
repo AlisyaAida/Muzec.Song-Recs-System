@@ -46,8 +46,6 @@ app.get("/api/token", async (req, res) => {
   }
 });
 
-
-
 //Gemini Recommendation Promt
 app.post("/api/recommend", async (req, res) => {
   const { mood, genre, language, songAge, allowExplicit, songHistory } = req.body;
@@ -68,7 +66,7 @@ const avoidList = songHistory && songHistory.length > 0
   ? `- Do NOT recommend any of these songs you already recommended:\n${songHistory.map(s => `  * "${s}"`).join("\n")}`
   : "";
 
-  const prompt = `You are a music recommendation expert.
+const prompt = `You are a music recommendation expert.
 
 Recommend ONE real song based on these preferences:
 - Mood: ${mood}
@@ -133,7 +131,7 @@ Respond ONLY in this exact JSON format, nothing else, no markdown:
   }
 });
 
-// ── Charts (one Gemini call for all genres) ───────────────────────────────────
+//Charts (one Gemini call for all genres)
 app.get("/api/charts", async (req, res) => {
 const prompt = `You are a music expert. For each of these genres: Pop, Rock, Hip-Hop, Jazz, Classical, K-Pop, R&B, Indie — list the 20 most popular songs right now.
 
