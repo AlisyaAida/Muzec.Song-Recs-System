@@ -10,6 +10,7 @@ let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
   if (!user) { window.location.href = "login.html"; return; }
+  currentUser = user;
   loadTopChartsPage();
 });
 
