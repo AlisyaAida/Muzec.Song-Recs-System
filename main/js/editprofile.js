@@ -9,7 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 import {
-  doc, getDoc, setDoc, serverTimestamp, collection, getDocs, deleteDoc  
+  doc, getDoc, setDoc, serverTimestamp, collection, getDocs, deleteDoc, updateDoc  
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -49,6 +49,81 @@ document.addEventListener("DOMContentLoaded", function () {
       emailInput.value     = data.email     || user.email;
       navUsername.textContent = data.firstName;
     }
+    
+    if (deleteAccountBtn) {
+  deleteAccountBtn.addEventListener("click", function () {
+    deleteConfirm.style.display = "block";
+    deleteAccountBtn.style.display = "none"; // hide button while confirming
+  });
+}
+
+//Cancel delete
+if (cancelDeleteBtn) {
+  cancelDeleteBtn.addEventListener("click", function () {
+    deleteConfirm.style.display  = "none";
+    deleteAccountBtn.style.display = "block";
+    deletePasswordInput.value    = "";
+  });
+}
+
+//Confirm delete 
+if (confirmDeleteBtn) {
+  confirmDeleteBtn.addEventListener("click", async function () {
+      console.log("DELETE BUTTON CLICKED");
+      console.log("=== DELETE DEBUG ===");
+      console.log("password:", deletePasswordInput.value);
+      console.log("currentUser:", currentUser);
+      console.log("password entered:", deletePasswordInput?.value?.length > 0);
+      console.log("deletePasswordInput element:", deletePasswordInput);
+      console.log("confirmDeleteBtn element:", confirmDeleteBtn);
+    if (!currentUser) { showError("Not logged in."); return; }
+
+    const password = deletePasswordInput.value.trim();
+    if (!password) {
+      showError("Please enter your password to confirm deletion.");
+      return;
+    }
+
+    confirmDeleteBtn.disabled    = true;
+    confirmDeleteBtn.textContent = "Deleting...";
+
+    try {
+      // Step 1 — Re-authenticate first (required by Firebase)
+      const credential = EmailAuthProvider.credential(
+        currentUser.email, password
+      );
+      await reauthenticateWithCredential(currentUser, credential);
+
+      const uid = currentUser.uid;
+
+      // Step 2 — Delete Firestore favorites sub-collection
+      const favsRef  = collection(db, "users", uid, "favorites");
+      const favSnap  = await getDocs(favsRef);
+      favSnap.forEach(async (d) => await deleteDoc(d.ref));
+
+      // Step 3 — Delete Firestore reviews sub-collection
+      const reviewsRef = collection(db, "users", uid, "reviews");
+      const reviewSnap = await getDocs(reviewsRef);
+      reviewSnap.forEach(async (d) => await deleteDoc(d.ref));
+
+      // Step 4 — Delete user document from Firestore
+      await deleteDoc(doc(db, "users", uid));
+
+      // Step 5 — Delete Firebase Auth account
+      await deleteUser(currentUser);
+
+      // Step 6 — Redirect to login
+      alert("Your account has been deleted.");
+      window.location.href = "login.html";
+
+    } catch (err) {
+      console.error("Delete error:", err);
+      confirmDeleteBtn.disabled    = false;
+      confirmDeleteBtn.textContent = "Yes, Delete My Account";
+      showError(getDeleteError(err.code));
+    }
+  });
+}
   });
 
     //null preventation guard for currentUser in case save is clicked before auth loads
@@ -143,73 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   //Show confirmation box for delete
-if (deleteAccountBtn) {
-  deleteAccountBtn.addEventListener("click", function () {
-    deleteConfirm.style.display = "block";
-    deleteAccountBtn.style.display = "none"; // hide button while confirming
-  });
-}
 
-//Cancel delete
-if (cancelDeleteBtn) {
-  cancelDeleteBtn.addEventListener("click", function () {
-    deleteConfirm.style.display  = "none";
-    deleteAccountBtn.style.display = "block";
-    deletePasswordInput.value    = "";
-  });
-}
-
-//Confirm delete 
-if (confirmDeleteBtn) {
-  confirmDeleteBtn.addEventListener("click", async function () {
-    if (!currentUser) { showError("Not logged in."); return; }
-
-    const password = deletePasswordInput.value.trim();
-    if (!password) {
-      showError("Please enter your password to confirm deletion.");
-      return;
-    }
-
-    confirmDeleteBtn.disabled    = true;
-    confirmDeleteBtn.textContent = "Deleting...";
-
-    try {
-      // Step 1 — Re-authenticate first (required by Firebase)
-      const credential = EmailAuthProvider.credential(
-        currentUser.email, password
-      );
-      await reauthenticateWithCredential(currentUser, credential);
-
-      const uid = currentUser.uid;
-
-      // Step 2 — Delete Firestore favorites sub-collection
-      const favsRef  = collection(db, "users", uid, "favorites");
-      const favSnap  = await getDocs(favsRef);
-      favSnap.forEach(async (d) => await deleteDoc(d.ref));
-
-      // Step 3 — Delete Firestore reviews sub-collection
-      const reviewsRef = collection(db, "users", uid, "reviews");
-      const reviewSnap = await getDocs(reviewsRef);
-      reviewSnap.forEach(async (d) => await deleteDoc(d.ref));
-
-      // Step 4 — Delete user document from Firestore
-      await deleteDoc(doc(db, "users", uid));
-
-      // Step 5 — Delete Firebase Auth account
-      await deleteUser(currentUser);
-
-      // Step 6 — Redirect to login
-      alert("Your account has been deleted.");
-      window.location.href = "login.html";
-
-    } catch (err) {
-      console.error("Delete error:", err);
-      confirmDeleteBtn.disabled    = false;
-      confirmDeleteBtn.textContent = "Yes, Delete My Account";
-      showError(getDeleteError(err.code));
-    }
-  });
-}
 
 //Error messages for delete 
 function getDeleteError(code) {
