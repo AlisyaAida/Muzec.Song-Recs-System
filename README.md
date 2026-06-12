@@ -176,7 +176,7 @@ Muzec/
 
 ## Authors
 
-Developed as part of the System Analysis and Design / Web Development Project.
+Developed as part of the Web Development Project.
 
 Universiti Malaya (UM)
 Faculty of Computer Science and Information Technology (FCSIT)
